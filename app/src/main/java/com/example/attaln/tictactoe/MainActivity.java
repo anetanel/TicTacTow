@@ -1,6 +1,7 @@
 package com.example.attaln.tictactoe;
 
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,12 +18,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<Button> buttons = new LinkedList<>();
     int moves;
     boolean gameWon;
+    MediaPlayer xSoundMediaPlayer;
+    MediaPlayer oSoundMediaPlayer;
+    MediaPlayer tieSoundMediaPlayer;
+    MediaPlayer winSoundMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         title = findViewById(R.id.title);
+
+        xSoundMediaPlayer = MediaPlayer.create(this, R.raw.x_sound);
+        oSoundMediaPlayer = MediaPlayer.create(this, R.raw.o_sound);
+        tieSoundMediaPlayer = MediaPlayer.create(this, R.raw.tie_sound);
+        winSoundMediaPlayer = MediaPlayer.create(this, R.raw.win_sound);
 
         // Game board buttons
         buttons.add((Button) findViewById(R.id.button1));
@@ -69,6 +79,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        if (xo.equals("X")) {
+            xSoundMediaPlayer.start();
+        } else {
+            oSoundMediaPlayer.start();
+        }
         Button b = findViewById(view.getId());
         moves++;
         b.setText(xo);
@@ -79,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (moves >= 5) checkWin();
         if (moves == 9 && !gameWon) {
+            tieSoundMediaPlayer.start();
             title.setText("Tie!");
             restartBtn.setText("New Game?");
         }
@@ -120,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void gameWon(Button btn1, Button btn2, Button btn3) {
+        if (!gameWon) winSoundMediaPlayer.start();
         gameWon = true;
         btn1.setTextColor(Color.RED);
         btn2.setTextColor(Color.RED);
