@@ -14,7 +14,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String xo;
     TextView title;
     Button restartBtn;
-    List<Button> btns = new LinkedList<>();
+    List<Button> buttons = new LinkedList<>();
+    int moves;
+    boolean gameWon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,15 +25,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         title = findViewById(R.id.title);
 
 
-        btns.add((Button) findViewById(R.id.button1));
-        btns.add((Button) findViewById(R.id.button2));
-        btns.add((Button) findViewById(R.id.button3));
-        btns.add((Button) findViewById(R.id.button4));
-        btns.add((Button) findViewById(R.id.button5));
-        btns.add((Button) findViewById(R.id.button6));
-        btns.add((Button) findViewById(R.id.button7));
-        btns.add((Button) findViewById(R.id.button8));
-        btns.add((Button) findViewById(R.id.button9));
+        buttons.add((Button) findViewById(R.id.button1));
+        buttons.add((Button) findViewById(R.id.button2));
+        buttons.add((Button) findViewById(R.id.button3));
+        buttons.add((Button) findViewById(R.id.button4));
+        buttons.add((Button) findViewById(R.id.button5));
+        buttons.add((Button) findViewById(R.id.button6));
+        buttons.add((Button) findViewById(R.id.button7));
+        buttons.add((Button) findViewById(R.id.button8));
+        buttons.add((Button) findViewById(R.id.button9));
         restartBtn = (Button) findViewById(R.id.restart);
         restartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        for (Button btn : btns) {
+        for (Button btn : buttons) {
             btn.setOnClickListener(this);
         }
 
@@ -48,11 +50,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void newGame() {
+        moves = 0;
         xo = "X";
-        title.setText("Now Playing: " + xo);
-        for(Button btn: btns) {
+        gameWon = false;
+        title.setText(xo + " Turn");
+        for (Button btn : buttons) {
             btn.setText(null);
-            btn.setTag(btns.indexOf(btn));
+            btn.setTag(buttons.indexOf(btn));
             btn.setClickable(true);
             btn.setTextColor(restartBtn.getTextColors());
         }
@@ -63,55 +67,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Button b = findViewById(view.getId());
         if (b.isClickable()) {
+            moves++;
             b.setText(xo);
             b.setTag(xo);
             b.setClickable(false);
             xo = xo.equals("X") ? "O" : "X";
-            title.setText("Now Playing: " + xo);
+            title.setText(xo + " Turn");
 
-            checkWin();
+            if (moves >= 5) checkWin();
+            if (moves == 9 && !gameWon) {
+                title.setText("Tie!");
+                restartBtn.setText("New Game?");
+            }
         }
     }
 
     private void checkWin() {
-        if (btns.get(0).getTag().equals(btns.get(1).getTag()) && btns.get(0).getTag().equals(btns.get(2).getTag())) {
-            gameOver(btns.get(0), btns.get(1), btns.get(2));
+        if (buttons.get(0).getTag().equals(buttons.get(1).getTag()) && buttons.get(0).getTag().equals(buttons.get(2).getTag())) {
+            gameWon(buttons.get(0), buttons.get(1), buttons.get(2));
         }
-        if (btns.get(3).getTag().equals(btns.get(4).getTag()) && btns.get(3).getTag().equals(btns.get(5).getTag())) {
-            gameOver(btns.get(3), btns.get(4), btns.get(5));
+        if (buttons.get(3).getTag().equals(buttons.get(4).getTag()) && buttons.get(3).getTag().equals(buttons.get(5).getTag())) {
+            gameWon(buttons.get(3), buttons.get(4), buttons.get(5));
         }
-        if (btns.get(6).getTag().equals(btns.get(7).getTag()) && btns.get(6).getTag().equals(btns.get(8).getTag())) {
-            gameOver(btns.get(6), btns.get(7), btns.get(8));
+        if (buttons.get(6).getTag().equals(buttons.get(7).getTag()) && buttons.get(6).getTag().equals(buttons.get(8).getTag())) {
+            gameWon(buttons.get(6), buttons.get(7), buttons.get(8));
         }
-        if (btns.get(0).getTag().equals(btns.get(3).getTag()) && btns.get(0).getTag().equals(btns.get(6).getTag())) {
-            gameOver(btns.get(0), btns.get(3), btns.get(6));
+        if (buttons.get(0).getTag().equals(buttons.get(3).getTag()) && buttons.get(0).getTag().equals(buttons.get(6).getTag())) {
+            gameWon(buttons.get(0), buttons.get(3), buttons.get(6));
         }
-        if (btns.get(1).getTag().equals(btns.get(4).getTag()) && btns.get(1).getTag().equals(btns.get(7).getTag())) {
-            gameOver(btns.get(1), btns.get(4), btns.get(7));
+        if (buttons.get(1).getTag().equals(buttons.get(4).getTag()) && buttons.get(1).getTag().equals(buttons.get(7).getTag())) {
+            gameWon(buttons.get(1), buttons.get(4), buttons.get(7));
         }
-        if (btns.get(2).getTag().equals(btns.get(5).getTag()) && btns.get(2).getTag().equals(btns.get(8).getTag())) {
-            gameOver(btns.get(2), btns.get(5), btns.get(8));
+        if (buttons.get(2).getTag().equals(buttons.get(5).getTag()) && buttons.get(2).getTag().equals(buttons.get(8).getTag())) {
+            gameWon(buttons.get(2), buttons.get(5), buttons.get(8));
         }
-        if (btns.get(0).getTag().equals(btns.get(4).getTag()) && btns.get(0).getTag().equals(btns.get(8).getTag())) {
-            gameOver(btns.get(0), btns.get(4), btns.get(8));
+        if (buttons.get(0).getTag().equals(buttons.get(4).getTag()) && buttons.get(0).getTag().equals(buttons.get(8).getTag())) {
+            gameWon(buttons.get(0), buttons.get(4), buttons.get(8));
         }
-        if (btns.get(2).getTag().equals(btns.get(4).getTag()) && btns.get(2).getTag().equals(btns.get(6).getTag())) {
-            gameOver(btns.get(2), btns.get(4), btns.get(6));
+        if (buttons.get(2).getTag().equals(buttons.get(4).getTag()) && buttons.get(2).getTag().equals(buttons.get(6).getTag())) {
+            gameWon(buttons.get(2), buttons.get(4), buttons.get(6));
         }
-
-
     }
 
-    private void gameOver(Button btn1, Button btn2, Button btn3) {
+    private void gameWon(Button btn1, Button btn2, Button btn3) {
+        gameWon = true;
         btn1.setTextColor(Color.RED);
         btn2.setTextColor(Color.RED);
         btn3.setTextColor(Color.RED);
 
-        for(Button btn: btns) {
+        for (Button btn : buttons) {
             btn.setClickable(false);
         }
 
-        title.setText("Game Over!");
+        title.setText(xo.equals("X") ? "O WON!" : "X WON!");
         restartBtn.setText("New Game?");
 
     }
