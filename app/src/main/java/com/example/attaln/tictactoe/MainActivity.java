@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         title = findViewById(R.id.title);
 
-
+        // Game board buttons
         buttons.add((Button) findViewById(R.id.button1));
         buttons.add((Button) findViewById(R.id.button2));
         buttons.add((Button) findViewById(R.id.button3));
@@ -34,6 +34,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add((Button) findViewById(R.id.button7));
         buttons.add((Button) findViewById(R.id.button8));
         buttons.add((Button) findViewById(R.id.button9));
+
+        for (Button btn : buttons) {
+            btn.setOnClickListener(this);
+        }
+
+        // Restart / New Game button
         restartBtn = (Button) findViewById(R.id.restart);
         restartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,18 +48,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        for (Button btn : buttons) {
-            btn.setOnClickListener(this);
-        }
-
         newGame();
     }
 
     private void newGame() {
+        // Initialize game
         moves = 0;
         xo = "X";
         gameWon = false;
         title.setText(xo + " Turn");
+
         for (Button btn : buttons) {
             btn.setText(null);
             btn.setTag(buttons.indexOf(btn));
@@ -66,44 +70,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         Button b = findViewById(view.getId());
-        if (b.isClickable()) {
-            moves++;
-            b.setText(xo);
-            b.setTag(xo);
-            b.setClickable(false);
-            xo = xo.equals("X") ? "O" : "X";
-            title.setText(xo + " Turn");
+        moves++;
+        b.setText(xo);
+        b.setTag(xo);
+        b.setClickable(false);
+        xo = xo.equals("X") ? "O" : "X";
+        title.setText(xo + " Turn");
 
-            if (moves >= 5) checkWin();
-            if (moves == 9 && !gameWon) {
-                title.setText("Tie!");
-                restartBtn.setText("New Game?");
-            }
+        if (moves >= 5) checkWin();
+        if (moves == 9 && !gameWon) {
+            title.setText("Tie!");
+            restartBtn.setText("New Game?");
         }
     }
 
     private void checkWin() {
+        // Top row
         if (buttons.get(0).getTag().equals(buttons.get(1).getTag()) && buttons.get(0).getTag().equals(buttons.get(2).getTag())) {
             gameWon(buttons.get(0), buttons.get(1), buttons.get(2));
         }
+        // Middle row
         if (buttons.get(3).getTag().equals(buttons.get(4).getTag()) && buttons.get(3).getTag().equals(buttons.get(5).getTag())) {
             gameWon(buttons.get(3), buttons.get(4), buttons.get(5));
         }
+        // Bottom row
         if (buttons.get(6).getTag().equals(buttons.get(7).getTag()) && buttons.get(6).getTag().equals(buttons.get(8).getTag())) {
             gameWon(buttons.get(6), buttons.get(7), buttons.get(8));
         }
+        // Left column
         if (buttons.get(0).getTag().equals(buttons.get(3).getTag()) && buttons.get(0).getTag().equals(buttons.get(6).getTag())) {
             gameWon(buttons.get(0), buttons.get(3), buttons.get(6));
         }
+        // Middle column
         if (buttons.get(1).getTag().equals(buttons.get(4).getTag()) && buttons.get(1).getTag().equals(buttons.get(7).getTag())) {
             gameWon(buttons.get(1), buttons.get(4), buttons.get(7));
         }
+        // Right column
         if (buttons.get(2).getTag().equals(buttons.get(5).getTag()) && buttons.get(2).getTag().equals(buttons.get(8).getTag())) {
             gameWon(buttons.get(2), buttons.get(5), buttons.get(8));
         }
+        // Top left to bottom right
         if (buttons.get(0).getTag().equals(buttons.get(4).getTag()) && buttons.get(0).getTag().equals(buttons.get(8).getTag())) {
             gameWon(buttons.get(0), buttons.get(4), buttons.get(8));
         }
+        // Top right to bottom left
         if (buttons.get(2).getTag().equals(buttons.get(4).getTag()) && buttons.get(2).getTag().equals(buttons.get(6).getTag())) {
             gameWon(buttons.get(2), buttons.get(4), buttons.get(6));
         }
