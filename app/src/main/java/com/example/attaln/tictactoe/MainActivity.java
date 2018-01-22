@@ -1,5 +1,6 @@
 package com.example.attaln.tictactoe;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -12,51 +13,39 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    String xo;
-    TextView title;
-    Button restartBtn;
-    List<Button> buttons = new LinkedList<>();
-    int moves;
-    boolean gameWon;
-    MediaPlayer xSoundMediaPlayer;
-    MediaPlayer oSoundMediaPlayer;
-    MediaPlayer tieSoundMediaPlayer;
-    MediaPlayer winSoundMediaPlayer;
+    private String xo;
+    private TextView title;
+    private Button restartBtn;
+    private List<Button> buttons = new LinkedList<>();
+    private int moves;
+    private boolean gameWon;
+    private MediaPlayer mediaPlayer;
 
+    @SuppressLint("FindViewByIdCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         title = findViewById(R.id.title);
 
-        xSoundMediaPlayer = MediaPlayer.create(this, R.raw.x_sound);
-        oSoundMediaPlayer = MediaPlayer.create(this, R.raw.o_sound);
-        tieSoundMediaPlayer = MediaPlayer.create(this, R.raw.tie_sound);
-        winSoundMediaPlayer = MediaPlayer.create(this, R.raw.win_sound);
-
         // Game board buttons
-        buttons.add((Button) findViewById(R.id.button1));
-        buttons.add((Button) findViewById(R.id.button2));
-        buttons.add((Button) findViewById(R.id.button3));
-        buttons.add((Button) findViewById(R.id.button4));
-        buttons.add((Button) findViewById(R.id.button5));
-        buttons.add((Button) findViewById(R.id.button6));
-        buttons.add((Button) findViewById(R.id.button7));
-        buttons.add((Button) findViewById(R.id.button8));
-        buttons.add((Button) findViewById(R.id.button9));
+        buttons.add(findViewById(R.id.button1));
+        buttons.add(findViewById(R.id.button2));
+        buttons.add(findViewById(R.id.button3));
+        buttons.add(findViewById(R.id.button4));
+        buttons.add(findViewById(R.id.button5));
+        buttons.add(findViewById(R.id.button6));
+        buttons.add(findViewById(R.id.button7));
+        buttons.add(findViewById(R.id.button8));
+        buttons.add(findViewById(R.id.button9));
 
         for (Button btn : buttons) {
             btn.setOnClickListener(this);
         }
 
         // Restart / New Game button
-        restartBtn = (Button) findViewById(R.id.restart);
-        restartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                newGame();
-            }
-        });
+        restartBtn = findViewById(R.id.restart);
+        restartBtn.setOnClickListener(view -> newGame());
 
         newGame();
     }
@@ -80,9 +69,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (xo.equals("X")) {
-            xSoundMediaPlayer.start();
+            playSound(R.raw.x_sound);
         } else {
-            oSoundMediaPlayer.start();
+            playSound(R.raw.o_sound);
         }
         Button b = findViewById(view.getId());
         moves++;
@@ -94,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (moves >= 5) checkWin();
         if (moves == 9 && !gameWon) {
-            tieSoundMediaPlayer.start();
+            playSound(R.raw.tie_sound);
             title.setText("Tie!");
             restartBtn.setText("New Game?");
         }
@@ -136,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void gameWon(Button btn1, Button btn2, Button btn3) {
-        if (!gameWon) winSoundMediaPlayer.start();
+        if (!gameWon) playSound(R.raw.win_sound);
         gameWon = true;
         btn1.setTextColor(Color.RED);
         btn2.setTextColor(Color.RED);
@@ -149,6 +138,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         title.setText(xo.equals("X") ? "O WON!" : "X WON!");
         restartBtn.setText("New Game?");
 
+    }
+
+    private void playSound(int i) {
+        if (mediaPlayer != null ) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        mediaPlayer = MediaPlayer.create(this, i);
+        mediaPlayer.start();
     }
 }
 
