@@ -13,6 +13,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    public static final String TITLE_TXT_KEY = "title_txt_key";
+    public static final String RESTART_BTN_TXT_KEY = "restart_btn_txt_key";
+    public static final String BTNS_TXT_KEY = "btns_txt_key";
+    public static final String BTNS_TAG_KEY = "btns_tag_key";
+    public static final String XO_KEY = "xo_key";
+    public static final String MOVES_KEY = "moves_key";
+    public static final String GAME_WON_KEY = "game_won_key";
+    public static final String BTNS_CLICK_KEY = "btn_click_key";
+    public static final String BTNS_COLOR_KEY = "btns_color_key";
     private String xo;
     private TextView title;
     private Button restartBtn;
@@ -47,7 +56,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         restartBtn = findViewById(R.id.restart);
         restartBtn.setOnClickListener(view -> newGame());
 
-        newGame();
+        if (savedInstanceState != null && savedInstanceState.containsKey(BTNS_TXT_KEY)) {
+            restoreState(savedInstanceState);
+        } else {
+            newGame();
+        }
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
+        xo = savedInstanceState.getString(XO_KEY);
+        moves = savedInstanceState.getInt(MOVES_KEY);
+        gameWon = savedInstanceState.getBoolean(GAME_WON_KEY);
+        title.setText(savedInstanceState.getString(TITLE_TXT_KEY));
+        restartBtn.setText(savedInstanceState.getString(RESTART_BTN_TXT_KEY));
+        for (Button btn : buttons) {
+            btn.setText(savedInstanceState.getStringArray(BTNS_TXT_KEY)[buttons.indexOf(btn)]);
+            btn.setTag(savedInstanceState.getStringArray(BTNS_TAG_KEY)[buttons.indexOf(btn)]);
+            btn.setClickable(savedInstanceState.getBooleanArray(BTNS_CLICK_KEY)[buttons.indexOf(btn)]);
+            btn.setTextColor(savedInstanceState.getIntArray(BTNS_COLOR_KEY)[buttons.indexOf(btn)]);
+        }
     }
 
     private void newGame() {
@@ -59,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         for (Button btn : buttons) {
             btn.setText(null);
-            btn.setTag(buttons.indexOf(btn));
+            btn.setTag(String.valueOf(buttons.indexOf(btn)));
             btn.setClickable(true);
             btn.setTextColor(restartBtn.getTextColors());
         }
@@ -78,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b.setText(xo);
         b.setTag(xo);
         b.setClickable(false);
-        xo = xo.equals("X") ? "O" : "X";
+        xo = (xo.equals("X") ? "O" : "X");
         title.setText(xo + " Turn");
 
         if (moves >= 5) checkWin();
@@ -87,6 +114,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             title.setText("Tie!");
             restartBtn.setText("New Game?");
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        saveState(outState);
+
+
+        super.onSaveInstanceState(outState);
+    }
+
+    private void saveState(Bundle outState) {
+        String titleTxt = title.getText().toString();
+        String restartBtnTxt = restartBtn.getText().toString();
+        String[] buttonsTxt = new String[9];
+        String[] buttonsTag = new String[9];
+        boolean[] buttonsClick = new boolean[9];
+        int[] buttonsColor = new int[9];
+
+
+        for (Button btn : buttons) {
+            buttonsTxt[buttons.indexOf(btn)] = btn.getText().toString();
+            buttonsTag[buttons.indexOf(btn)] = btn.getTag().toString();
+            buttonsClick[buttons.indexOf(btn)] = btn.isClickable();
+            buttonsColor[buttons.indexOf(btn)] = btn.getTextColors().getDefaultColor();
+        }
+
+        outState.putString(XO_KEY, xo);
+        outState.putInt(MOVES_KEY, moves);
+        outState.putBoolean(GAME_WON_KEY, gameWon);
+        outState.putString(TITLE_TXT_KEY, titleTxt);
+        outState.putString(RESTART_BTN_TXT_KEY, restartBtnTxt);
+        outState.putStringArray(BTNS_TXT_KEY, buttonsTxt);
+        outState.putStringArray(BTNS_TAG_KEY, buttonsTag);
+        outState.putBooleanArray(BTNS_CLICK_KEY, buttonsClick);
+        outState.putIntArray(BTNS_COLOR_KEY, buttonsColor);
     }
 
     private void checkWin() {
@@ -141,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void playSound(int i) {
-        if (mediaPlayer != null ) {
+        if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
         }
